@@ -44,7 +44,7 @@ def Restriccion5(a, b):
 problem.addConstraint(AllEqualConstraint(), (satelites[:2]))
 # SAT2, SAT4 y SAT5 antenas diferentes
 problem.addConstraint(AllDifferentConstraint(),
-                      (satelites[1], satelites[3], satelites[4]))
+                      (satelites[1], satelites[4], satelites[5]))
 # Si SAT5 se comunica con ANT12, SAT4 no se puede comunicar con ANT11
 problem.addConstraint(Restriccion4, (satelites[5:3:-1]))
 # Si en una solución se asignan las antenas ANT7 y ANT12,
