@@ -20,12 +20,19 @@ satelitesDespues12 = [satelites[3], satelites[4], satelites[7]]
 # Añadimos a cada satelite las antenas visibles según la tabla
 problem.addVariable(satelites[0], antenas[:4])
 problem.addVariable(satelites[1], antenas[:3])
-problem.addVariable(satelites[2], antenas[3:6:2])
+problem.addVariable(satelites[2], (antenas[3], antenas[5]))
 problem.addVariable(satelites[3], (antenas[6], antenas[8], antenas[9]))
 problem.addVariable(satelites[4], (antenas[7], antenas[10], antenas[11]))
 problem.addVariable(satelites[5], (antenas[0], antenas[6], antenas[11]))
-problem.addVariable(satelites[6], antenas[6:10:2])
+problem.addVariable(satelites[6], (antenas[6], antenas[8]))
 problem.addVariable(satelites[7], antenas[2:5])
+
+# R2: SAT1 y SAT2 misma antena
+problem.addConstraint(AllEqualConstraint(), (satelites[:2]))
+
+# R3: SAT2, SAT4 y SAT5 antenas diferentes
+problem.addConstraint(AllDifferentConstraint(),
+                      (satelites[1], satelites[4], satelites[5]))
 
 
 def Restriccion4(a, b):
@@ -34,29 +41,25 @@ def Restriccion4(a, b):
     return True
 
 
+# R4: Si SAT5 se comunica con ANT12, SAT4 no se puede comunicar con ANT11
+problem.addConstraint(Restriccion4, (satelites[5], satelites[4]))
+
+
 def Restriccion5(a, b):
     if(a == 'ANT7' and b == 'ANT12') or (a == 'ANT12' and b == 'ANT7'):
         return False
     return True
 
 
-# SAT1 y SAT2 misma antena
-problem.addConstraint(AllEqualConstraint(), (satelites[:2]))
-# SAT2, SAT4 y SAT5 antenas diferentes
-problem.addConstraint(AllDifferentConstraint(),
-                      (satelites[1], satelites[4], satelites[5]))
-# Si SAT5 se comunica con ANT12, SAT4 no se puede comunicar con ANT11
-problem.addConstraint(Restriccion4, (satelites[5:3:-1]))
-# Si en una solución se asignan las antenas ANT7 y ANT12,
-# se deben asignar ambas a franjas horarias que comiencen antes de las 12:00
-# o a franjas horarias que comiencen después de las 12:00
+# R5: Si en una solución se asignan las antenas ANT7 y ANT12,
+# se deben asignar ambas a franjas horarias que comiencen antes de las
+# 12:00 o a franjas horarias que comiencen después de las 12:00
 for i in range(len(satelitesAntes12)):
     for j in range(len(satelitesDespues12)):
         problem.addConstraint(
             Restriccion5, (satelitesAntes12[i], satelitesDespues12[j]))
 
+
 # Obtenemos todas las soluciones posibles
 solutions = problem.getSolutions()
 print(len(solutions))
-# for i in solutions:
-# print(i)
